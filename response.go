@@ -5,11 +5,11 @@ package gcm
 // Overview for more information:
 // http://developer.android.com/google/gcm/gcm.html#send-msg
 type Response struct {
-	MulticastID  int64    `json:"multicast_id"`
-	Success      int      `json:"success"`
-	Failure      int      `json:"failure"`
-	CanonicalIDs int      `json:"canonical_ids"`
-	Results      []Result `json:"results"`
+	//MulticastID  int64    `json:"multicast_id"`
+	Success     	bool      `json:"success"`
+	Error      string      `json:"error"`
+	//CanonicalIDs int      `json:"canonical_ids"`
+	//Results      []Result `json:"results"`
 }
 
 // Result represents the status of a processed message.

@@ -13,13 +13,13 @@ const (
 // http://developer.android.com/google/gcm/gcm.html#send-msg
 type Message struct {
 	RegistrationIDs       []string               `json:"registration_ids"`
-	CollapseKey           string                 `json:"collapse_key,omitempty"`
+	//CollapseKey           string                 `json:"collapse_key,omitempty"`
 	Data                  map[string]interface{} `json:"data,omitempty"`
-	DelayWhileIdle        bool                   `json:"delay_while_idle,omitempty"`
+	//DelayWhileIdle        bool                   `json:"delay_while_idle,omitempty"`
 	TimeToLive            int                    `json:"time_to_live,omitempty"`
-	RestrictedPackageName string                 `json:"restricted_package_name,omitempty"`
-	DryRun                bool                   `json:"dry_run,omitempty"`
-	Priority              string                 `json:"priority,omitempty"`
+	//RestrictedPackageName string                 `json:"restricted_package_name,omitempty"`
+	//DryRun                bool                   `json:"dry_run,omitempty"`
+	//Priority              string                 `json:"priority,omitempty"`
 }
 
 // NewMessage returns a new Message with the specified payload

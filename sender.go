@@ -8,14 +8,16 @@ import (
 	"errors"
 	"fmt"
 	"io/ioutil"
-	"math/rand"
+//	"math/rand"
 	"net/http"
-	"time"
+//	"time"
+	"strings"
 )
 
 const (
 	// GcmSendEndpoint is the endpoint for sending messages to the GCM server.
-	GcmSendEndpoint = "https://android.googleapis.com/gcm/send"
+	//GcmSendEndpoint = "https://android.googleapis.com/gcm/send"
+	GcmSendEndpoint = "https://pushy.me/push?api_key="
 	// Initial delay before first retry, without jitter.
 	backoffInitialDelay = 1000
 	// Maximum delay before a retry.
@@ -63,11 +65,12 @@ func (s *Sender) SendNoRetry(msg *Message) (*Response, error) {
 		return nil, err
 	}
 
-	req, err := http.NewRequest("POST", gcmSendEndpoint, bytes.NewBuffer(data))
+	endPoint := strings.Join([]string{gcmSendEndpoint,s.ApiKey},"") //MG
+	req, err := http.NewRequest("POST", endPoint, bytes.NewBuffer(data))
 	if err != nil {
 		return nil, err
 	}
-	req.Header.Add("Authorization", fmt.Sprintf("key=%s", s.ApiKey))
+	//req.Header.Add("Authorization", fmt.Sprintf("key=%s", s.ApiKey))
 	req.Header.Add("Content-Type", "application/json")
 
 	resp, err := s.Http.Do(req)
@@ -109,12 +112,13 @@ func (s *Sender) Send(msg *Message, retries int) (*Response, error) {
 	resp, err := s.SendNoRetry(msg)
 	if err != nil {
 		return nil, err
-	} else if resp.Failure == 0 || retries == 0 {
+	//MG} else if resp.Failure == 0 || retries == 0 {
+	} else if resp.Error == "" || retries == 0 {
 		return resp, nil
 	}
 
 	// One or more messages failed to send.
-	regIDs := msg.RegistrationIDs
+/*MG	regIDs := msg.RegistrationIDs
 	allResults := make(map[string]Result, len(regIDs))
 	backoff := backoffInitialDelay
 	for i := 0; updateStatus(msg, resp, allResults) > 0 && i < retries; i++ {
@@ -129,9 +133,9 @@ func (s *Sender) Send(msg *Message, retries int) (*Response, error) {
 
 	// Bring the message back to its original state.
 	msg.RegistrationIDs = regIDs
-
+*/
 	// Create a Response containing the overall results.
-	finalResults := make([]Result, len(regIDs))
+	/*MG finalResults := make([]Result, len(regIDs))
 	var success, failure, canonicalIDs int
 	for i := 0; i < len(regIDs); i++ {
 		result, _ := allResults[regIDs[i]]
@@ -144,21 +148,22 @@ func (s *Sender) Send(msg *Message, retries int) (*Response, error) {
 		} else {
 			failure++
 		}
-	}
+	}*/
 
 	return &Response{
 		// Return the most recent multicast id.
-		MulticastID:  resp.MulticastID,
-		Success:      success,
-		Failure:      failure,
-		CanonicalIDs: canonicalIDs,
-		Results:      finalResults,
+		//MulticastID:  resp.MulticastID,
+		Success:      resp.Success, //success,
+		Error:	resp.Error, //error,
+		//Failure:      failure,
+		//CanonicalIDs: canonicalIDs,
+		//Results:      finalResults,
 	}, nil
 }
 
 // updateStatus updates the status of the messages sent to devices and
 // returns the number of recoverable errors that could be retried.
-func updateStatus(msg *Message, resp *Response, allResults map[string]Result) int {
+/*MG func updateStatus(msg *Message, resp *Response, allResults map[string]Result) int {
 	unsentRegIDs := make([]string, 0, resp.Failure)
 	for i := 0; i < len(resp.Results); i++ {
 		regID := msg.RegistrationIDs[i]
@@ -170,7 +175,7 @@ func updateStatus(msg *Message, resp *Response, allResults map[string]Result) in
 	msg.RegistrationIDs = unsentRegIDs
 	return len(unsentRegIDs)
 }
-
+*/
 // min returns the smaller of two integers. For exciting religious wars
 // about why this wasn't included in the "math" package, see this thread:
 // https://groups.google.com/d/topic/golang-nuts/dbyqx_LGUxM/discussion
@@ -206,8 +211,8 @@ func checkMessage(msg *Message) error {
 	} else if msg.TimeToLive < 0 || 2419200 < msg.TimeToLive {
 		return errors.New("the message's TimeToLive field must be an integer " +
 			"between 0 and 2419200 (4 weeks)")
-	} else if len(msg.Priority) > 0 && msg.Priority != HighPriority && msg.Priority != NormalPriority {
-		return errors.New("the message priority value must be normal or high")
+	//} else if len(msg.Priority) > 0 && msg.Priority != HighPriority && msg.Priority != NormalPriority {
+	//	return errors.New("the message priority value must be normal or high")
 	}
 	return nil
 }
