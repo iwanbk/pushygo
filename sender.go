@@ -8,16 +8,16 @@ import (
 	"errors"
 	"fmt"
 	"io/ioutil"
-//	"math/rand"
+	//	"math/rand"
 	"net/http"
-//	"time"
+	//	"time"
 	"strings"
 )
 
 const (
 	// GcmSendEndpoint is the endpoint for sending messages to the GCM server.
 	//GcmSendEndpoint = "https://android.googleapis.com/gcm/send"
-	GcmSendEndpoint = "https://pushy.me/push?api_key="
+	GcmSendEndpoint = "https://api.pushy.me/push?api_key="
 	// Initial delay before first retry, without jitter.
 	backoffInitialDelay = 1000
 	// Maximum delay before a retry.
@@ -65,7 +65,7 @@ func (s *Sender) SendNoRetry(msg *Message) (*Response, error) {
 		return nil, err
 	}
 
-	endPoint := strings.Join([]string{gcmSendEndpoint,s.ApiKey},"") //MG
+	endPoint := strings.Join([]string{gcmSendEndpoint, s.ApiKey}, "") //MG
 	req, err := http.NewRequest("POST", endPoint, bytes.NewBuffer(data))
 	if err != nil {
 		return nil, err
@@ -112,13 +112,13 @@ func (s *Sender) Send(msg *Message, retries int) (*Response, error) {
 	resp, err := s.SendNoRetry(msg)
 	if err != nil {
 		return nil, err
-	//MG} else if resp.Failure == 0 || retries == 0 {
+		//MG} else if resp.Failure == 0 || retries == 0 {
 	} else if resp.Error == "" || retries == 0 {
 		return resp, nil
 	}
 
 	// One or more messages failed to send.
-/*MG	regIDs := msg.RegistrationIDs
+	/*MG	regIDs := msg.RegistrationIDs
 	allResults := make(map[string]Result, len(regIDs))
 	backoff := backoffInitialDelay
 	for i := 0; updateStatus(msg, resp, allResults) > 0 && i < retries; i++ {
@@ -133,7 +133,7 @@ func (s *Sender) Send(msg *Message, retries int) (*Response, error) {
 
 	// Bring the message back to its original state.
 	msg.RegistrationIDs = regIDs
-*/
+	*/
 	// Create a Response containing the overall results.
 	/*MG finalResults := make([]Result, len(regIDs))
 	var success, failure, canonicalIDs int
@@ -153,8 +153,8 @@ func (s *Sender) Send(msg *Message, retries int) (*Response, error) {
 	return &Response{
 		// Return the most recent multicast id.
 		//MulticastID:  resp.MulticastID,
-		Success:      resp.Success, //success,
-		Error:	resp.Error, //error,
+		Success: resp.Success, //success,
+		Error:   resp.Error,   //error,
 		//Failure:      failure,
 		//CanonicalIDs: canonicalIDs,
 		//Results:      finalResults,
@@ -211,8 +211,8 @@ func checkMessage(msg *Message) error {
 	} else if msg.TimeToLive < 0 || 2419200 < msg.TimeToLive {
 		return errors.New("the message's TimeToLive field must be an integer " +
 			"between 0 and 2419200 (4 weeks)")
-	//} else if len(msg.Priority) > 0 && msg.Priority != HighPriority && msg.Priority != NormalPriority {
-	//	return errors.New("the message priority value must be normal or high")
+		//} else if len(msg.Priority) > 0 && msg.Priority != HighPriority && msg.Priority != NormalPriority {
+		//	return errors.New("the message priority value must be normal or high")
 	}
 	return nil
 }
